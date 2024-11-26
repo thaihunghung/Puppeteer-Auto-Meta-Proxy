@@ -60,6 +60,22 @@ const WalletLoader = function (filePath) {
             }
 
             return proxies;
+        },
+
+        getWalletData: function () {
+            const data = this.loadFile();
+            const addresses = [];
+            const proxies = [];
+            const x = [];
+            // Duyệt qua từng dòng trong dữ liệu để trích xuất Address và Proxy
+            data.forEach((row) => {
+                if (row.Address) addresses.push(row.Address);
+                if (row.Proxy) proxies.push(row.Proxy);
+                if (row.X) x.push(row.X);
+            });
+            
+            console.log({ addresses, proxies, x })
+            return { addresses, proxies, x};
         }
     };
 };

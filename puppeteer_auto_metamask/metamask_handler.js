@@ -71,7 +71,7 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
                 if (url === 'about:blank') {
                     await page.close();
                 }
-                if (url === url.includes('chrome-extension://')) {
+                if (url === 'chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#onboarding/welcome') {
                     await page.close();
                 }
             }
