@@ -2,10 +2,10 @@ const puppeteer = require('puppeteer');
 const proxyChain = require('proxy-chain');
 const path = require('path');
 
-const PuppeteerAutoMetaMask = function (extensionPath, proxie) {
+const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
     return {
         launchBrowser: async function () {       
-            const oldProxyUrl = proxie;
+            const oldProxyUrl = proxy;
             const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
             return puppeteer.launch({
                 headless: false,                

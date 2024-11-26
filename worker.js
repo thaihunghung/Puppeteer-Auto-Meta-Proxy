@@ -1,6 +1,6 @@
 const PuppeteerAutoMetaMask = require('./puppeteer_auto_metamask/metamask_handler');
 const { workerData, parentPort } = require('worker_threads');
-const puppeteerAutoMetaMask = PuppeteerAutoMetaMask(workerData.extensionPath, workerData.proxie);
+const puppeteerAutoMetaMask = PuppeteerAutoMetaMask(workerData.extensionPath, workerData.proxy);
 
 async function run() {
     const browser = await puppeteerAutoMetaMask.launchBrowser();
