@@ -3,7 +3,29 @@ const proxyChain = require('proxy-chain');
 const path = require('path');
 
 const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
+    const NetworkzkCandy = {
+        networkName: "zkCandy Sepolia Testnet",
+        currencySymbol: "ETH",
+        networkUrl: "https://sepolia.rpc.zkcandy.io",
+        chainId: 302,
+        blockExplorerUrl: "https://sepolia.explorer.zkcandy.io"
+    }
     return {
+        Browser: async function () {       
+            const oldProxyUrl = proxy;
+            const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
+            return puppeteer.launch({
+                headless: false,                
+                args: [
+                    `--proxy-server=${newProxyUrl}`,
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-extensions',
+                    '--disable-popup-blocking',
+                    '--no-first-run', 
+                ],
+            });
+        },
         launchBrowser: async function () {       
             const oldProxyUrl = proxy;
             const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
@@ -44,19 +66,19 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
             await page.type("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(1) > label > input", password, { delay: 100 });
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(2) > label > input", { visible: true });
             await page.type("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(2) > label > input", password, { delay: 100 });
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div.mm-box.mm-box--margin-top-4.mm-box--margin-bottom-4.mm-box--justify-content-space-between.mm-box--align-items-center > label > span.mm-checkbox__input-wrapper > input", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div.mm-box.mm-box--margin-top-4.mm-box--margin-bottom-4.mm-box--justify-content-space-between.mm-box--align-items-center > label > span.mm-checkbox__input-wrapper > input");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > button");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.creation-successful__actions.mm-box--margin-top-6.mm-box--display-flex.mm-box--flex-direction-column.mm-box--justify-content-center.mm-box--align-items-center > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.creation-successful__actions.mm-box--margin-top-6.mm-box--display-flex.mm-box--flex-direction-column.mm-box--justify-content-center.mm-box--align-items-center > button");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button");
         },
@@ -77,14 +99,12 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
             }
 
             // MetaMask onboarding
-            await newPage.waitForSelector("#onboarding__terms-checkbox", { visible: true, timeout: 60000 });
             await newPage.click("#onboarding__terms-checkbox");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
 
             await newPage.click(
                 '#app-content > div > div.mm-box.main-container-wrapper > div > div > div > ul > li:nth-child(3) > button'
             );
-            await new Promise(resolve => setTimeout(resolve, 1000));
 
             await newPage.click(
                 '#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.onboarding-metametrics__buttons.mm-box--display-flex.mm-box--gap-4.mm-box--flex-direction-row.mm-box--width-full > button.mm-box.mm-text.mm-button-base.mm-button-base--size-lg.mm-button-primary.mm-text--body-md-medium.mm-box--padding-0.mm-box--padding-right-4.mm-box--padding-left-4.mm-box--display-inline-flex.mm-box--justify-content-center.mm-box--align-items-center.mm-box--color-primary-inverse.mm-box--background-color-primary-default.mm-box--rounded-pill'
@@ -92,9 +112,24 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
             await this.inputMnemonic(newPage, formattedMnemonic);
             await newPage.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button", { visible: true });
             await newPage.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+
             const password = 'hunghung'
             await this.inputPasswordMetaMask(newPage,password)
+            
+        },
+
+        ChangeNetWork: async function (page, ChainID) {
+            await page.goto(`https://chainlist.org/chain/${ChainID}`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            await page.waitForSelector("#__next > div > div.dark\:bg-\[\#181818\].bg-\[\#f3f3f3\].p-5.relative.flex.flex-col.gap-5 > div:nth-child(2) > button", { visible: true });
+            await page.click("#__next > div > div.dark\:bg-\[\#181818\].bg-\[\#f3f3f3\].p-5.relative.flex.flex-col.gap-5 > div:nth-child(2) > button");
+
+
+
+
+
+            
+            
         },
     };
 };

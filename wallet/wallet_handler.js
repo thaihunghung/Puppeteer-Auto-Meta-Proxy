@@ -74,7 +74,7 @@ const WalletLoader = function (filePath) {
                 if (row.X) x.push(row.X);
             });
             
-            console.log({ addresses, proxies, x })
+            // console.log({ addresses, proxies, x })
             return { addresses, proxies, x};
         }
     };
