@@ -118,52 +118,56 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
         },
 
         GetAddressByMnemonic: async function (browser, Mnemonic) {
-            const context = browser.defaultBrowserContext();
-            await context.overridePermissions('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#', ['clipboard-read']);
             await new Promise(resolve => setTimeout(resolve, 10000));
             const formattedMnemonic = Mnemonic.split(' ');
             const pages = await browser.pages();
             const newPage = await browser.newPage();
+            const WEBSITE_URL = 'chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#'
             await newPage.goto('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#onboarding/welcome');
+            const context = browser.defaultBrowserContext();
+            await context.overridePermissions(WEBSITE_URL, [
+                "clipboard-read",
+                "clipboard-write",
+                "clipboard-sanitized-write",
+            ]);
             this.CloseblankAndExtension(pages)
+            //await newPage.waitForSelector("#onboarding__terms-checkbox", { visible: true, timeout: 5000 });
+
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            await newPage.waitForSelector("#onboarding__terms-checkbox", { visible: true, timeout: 10000 });
+            await newPage.evaluate(() => {
+                document.querySelector("#onboarding__terms-checkbox").scrollIntoView();
+            });
             await newPage.click("#onboarding__terms-checkbox");
+
+            // Tương tự cho các nút tiếp theo
+            await newPage.waitForSelector('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > ul > li:nth-child(3) > button', { visible: true, timeout: 10000 });
             await newPage.click('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > ul > li:nth-child(3) > button');
+
+            // Và nút cuối cùng
+            await newPage.waitForSelector('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.onboarding-metametrics__buttons.mm-box--display-flex.mm-box--gap-4.mm-box--flex-direction-row.mm-box--width-full > button.mm-box.mm-text.mm-button-base.mm-button-base--size-lg.mm-button-primary.mm-text--body-md-medium.mm-box--padding-0.mm-box--padding-right-4.mm-box--padding-left-4.mm-box--display-inline-flex.mm-box--justify-content-center.mm-box--align-items-center.mm-box--color-primary-inverse.mm-box--background-color-primary-default.mm-box--rounded-pill', { visible: true, timeout: 10000 });
             await newPage.click('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.onboarding-metametrics__buttons.mm-box--display-flex.mm-box--gap-4.mm-box--flex-direction-row.mm-box--width-full > button.mm-box.mm-text.mm-button-base.mm-button-base--size-lg.mm-button-primary.mm-text--body-md-medium.mm-box--padding-0.mm-box--padding-right-4.mm-box--padding-left-4.mm-box--display-inline-flex.mm-box--justify-content-center.mm-box--align-items-center.mm-box--color-primary-inverse.mm-box--background-color-primary-default.mm-box--rounded-pill');
+
+
+
             await this.inputMnemonic(newPage, formattedMnemonic);
             await newPage.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button", { visible: true });
             await newPage.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button");
             const password = 'hunghung'
             await this.inputPasswordMetaMask(newPage, password)
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            
+            await new Promise(resolve => setTimeout(resolve, 10000));
+
+            // buton copy address in metamask
             await newPage.waitForSelector("#app-content > div > div.mm-box.multichain-app-header.mm-box--margin-bottom-0.mm-box--display-flex.mm-box--align-items-center.mm-box--width-full.mm-box--background-color-background-alternative > div > div.mm-box.mm-text.mm-text--body-md.mm-text--ellipsis.mm-box--display-flex.mm-box--flex-direction-column.mm-box--align-items-center.mm-box--color-text-default > div > div > button", { visible: true });
             await newPage.click("#app-content > div > div.mm-box.multichain-app-header.mm-box--margin-bottom-0.mm-box--display-flex.mm-box--align-items-center.mm-box--width-full.mm-box--background-color-background-alternative > div > div.mm-box.mm-text.mm-text--body-md.mm-text--ellipsis.mm-box--display-flex.mm-box--flex-direction-column.mm-box--align-items-center.mm-box--color-text-default > div > div > button");
-
-            const copiedValue = await newPage.evaluate(async () => {
-                return await navigator.clipboard.readText();
+            // -- how to get address 
+            // -- how to get address 
+            const clipboardContent = await newPage.evaluate(async () => {
+                const text = navigator.clipboard.readText();
+                return text;
             });
 
-            const temp =copiedValue
-            console.log('temp', temp);
-
-            fs.readFile('clipboardValue.txt', 'utf8', (err, data) => {
-                if (err) {
-                  console.error('Lỗi khi đọc file:', err);
-                  return;
-                }
-              
-                // Thêm copiedValue vào nội dung file sau khi đọc
-                const newContent = data + `\n${temp}`;
-              
-                // Ghi lại nội dung đã cập nhật vào file clipboardValue.txt
-                fs.writeFile('clipboardValue.txt', newContent, 'utf8', (err) => {
-                  if (err) {
-                    console.error('Lỗi khi ghi file:', err);
-                  } else {
-                    console.log('Đã ghi giá trị vào file clipboardValue.txt');
-                  }
-                });
-              });
+            console.log("Clipboard content:", clipboardContent)
         },
     };
 };
