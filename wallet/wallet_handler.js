@@ -65,17 +65,19 @@ const WalletLoader = function (filePath) {
         getWalletData: function () {
             const data = this.loadFile();
             const addresses = [];
+            const Mnemonics = [];
             const proxies = [];
             const x = [];
             // Duyệt qua từng dòng trong dữ liệu để trích xuất Address và Proxy
             data.forEach((row) => {
                 if (row.Address) addresses.push(row.Address);
                 if (row.Proxy) proxies.push(row.Proxy);
+                if (row.Mnemonic) Mnemonics.push(row.Mnemonic);
                 if (row.X) x.push(row.X);
             });
             
             // console.log({ addresses, proxies, x })
-            return { addresses, proxies, x};
+            return { addresses, proxies, x, Mnemonics};
         }
     };
 };

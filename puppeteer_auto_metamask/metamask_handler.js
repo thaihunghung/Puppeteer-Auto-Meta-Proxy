@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const proxyChain = require('proxy-chain');
+const fs = require('fs');
 const path = require('path');
 
 const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
@@ -11,26 +12,26 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
         blockExplorerUrl: "https://sepolia.explorer.zkcandy.io"
     }
     return {
-        Browser: async function () {       
+        Browser: async function () {
             const oldProxyUrl = proxy;
             const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
             return puppeteer.launch({
-                headless: false,                
+                headless: false,
                 args: [
                     `--proxy-server=${newProxyUrl}`,
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
                     '--disable-extensions',
                     '--disable-popup-blocking',
-                    '--no-first-run', 
+                    '--no-first-run',
                 ],
             });
         },
-        launchBrowser: async function () {       
+        launchBrowser: async function () {
             const oldProxyUrl = proxy;
             const newProxyUrl = await proxyChain.anonymizeProxy(oldProxyUrl);
             return puppeteer.launch({
-                headless: false,                
+                headless: false,
                 args: [
                     `--proxy-server=${newProxyUrl}`,
                     `--disable-extensions-except=${extensionPath}`,
@@ -39,7 +40,7 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
                     '--disable-setuid-sandbox',
                     '--disable-extensions',
                     '--disable-popup-blocking',
-                    '--no-first-run', 
+                    '--no-first-run',
                 ],
             });
         },
@@ -60,34 +61,29 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
                 // console.log(`Word ${i + 1} of 12 typed successfully.`);
             }
         },
-               
+
         inputPasswordMetaMask: async function (page, password) {
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(1) > label > input", { visible: true });
             await page.type("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(1) > label > input", password, { delay: 100 });
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(2) > label > input", { visible: true });
             await page.type("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div:nth-child(2) > label > input", password, { delay: 100 });
-            
+
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div.mm-box.mm-box--margin-top-4.mm-box--margin-bottom-4.mm-box--justify-content-space-between.mm-box--align-items-center > label > span.mm-checkbox__input-wrapper > input", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > div.mm-box.mm-box--margin-top-4.mm-box--margin-bottom-4.mm-box--justify-content-space-between.mm-box--align-items-center > label > span.mm-checkbox__input-wrapper > input");
-            
+
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.mm-box--margin-top-3.mm-box--justify-content-center > form > button");
-            
+
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.creation-successful__actions.mm-box--margin-top-6.mm-box--display-flex.mm-box--flex-direction-column.mm-box--justify-content-center.mm-box--align-items-center > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.creation-successful__actions.mm-box--margin-top-6.mm-box--display-flex.mm-box--flex-direction-column.mm-box--justify-content-center.mm-box--align-items-center > button");
-            
+
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button");
-            
+
             await page.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button", { visible: true });
             await page.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.onboarding-pin-extension__buttons > button");
         },
-        
-        interactWithMetaMask: async function (browser, formattedMnemonic) {
-            const pages = await browser.pages();
-            const newPage = await browser.newPage();
-            await newPage.goto('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#onboarding/welcome');
-
+        CloseblankAndExtension: async function (pages) {
             for (const page of pages) {
                 const url = await page.url();
                 if (url === 'about:blank') {
@@ -97,25 +93,21 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
                     await page.close();
                 }
             }
-
+        },
+        interactWithMetaMask: async function (browser, formattedMnemonic) {
+            const pages = await browser.pages();
+            const newPage = await browser.newPage();
+            await newPage.goto('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#onboarding/welcome');
+            this.CloseblankAndExtension(pages)
             // MetaMask onboarding
             await newPage.click("#onboarding__terms-checkbox");
-            
-
-            await newPage.click(
-                '#app-content > div > div.mm-box.main-container-wrapper > div > div > div > ul > li:nth-child(3) > button'
-            );
-
-            await newPage.click(
-                '#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.onboarding-metametrics__buttons.mm-box--display-flex.mm-box--gap-4.mm-box--flex-direction-row.mm-box--width-full > button.mm-box.mm-text.mm-button-base.mm-button-base--size-lg.mm-button-primary.mm-text--body-md-medium.mm-box--padding-0.mm-box--padding-right-4.mm-box--padding-left-4.mm-box--display-inline-flex.mm-box--justify-content-center.mm-box--align-items-center.mm-box--color-primary-inverse.mm-box--background-color-primary-default.mm-box--rounded-pill'
-            );
+            await newPage.click('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > ul > li:nth-child(3) > button');
+            await newPage.click('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.onboarding-metametrics__buttons.mm-box--display-flex.mm-box--gap-4.mm-box--flex-direction-row.mm-box--width-full > button.mm-box.mm-text.mm-button-base.mm-button-base--size-lg.mm-button-primary.mm-text--body-md-medium.mm-box--padding-0.mm-box--padding-right-4.mm-box--padding-left-4.mm-box--display-inline-flex.mm-box--justify-content-center.mm-box--align-items-center.mm-box--color-primary-inverse.mm-box--background-color-primary-default.mm-box--rounded-pill');
             await this.inputMnemonic(newPage, formattedMnemonic);
             await newPage.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button", { visible: true });
             await newPage.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button");
-
             const password = 'hunghung'
-            await this.inputPasswordMetaMask(newPage,password)
-            
+            await this.inputPasswordMetaMask(newPage, password)
         },
 
         ChangeNetWork: async function (page, ChainID) {
@@ -123,13 +115,55 @@ const PuppeteerAutoMetaMask = function (extensionPath, proxy) {
             await new Promise(resolve => setTimeout(resolve, 3000));
             await page.waitForSelector("#__next > div > div.dark\:bg-\[\#181818\].bg-\[\#f3f3f3\].p-5.relative.flex.flex-col.gap-5 > div:nth-child(2) > button", { visible: true });
             await page.click("#__next > div > div.dark\:bg-\[\#181818\].bg-\[\#f3f3f3\].p-5.relative.flex.flex-col.gap-5 > div:nth-child(2) > button");
+        },
 
-
-
-
-
+        GetAddressByMnemonic: async function (browser, Mnemonic) {
+            const context = browser.defaultBrowserContext();
+            await context.overridePermissions('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#', ['clipboard-read']);
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            const formattedMnemonic = Mnemonic.split(' ');
+            const pages = await browser.pages();
+            const newPage = await browser.newPage();
+            await newPage.goto('chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/home.html#onboarding/welcome');
+            this.CloseblankAndExtension(pages)
+            await newPage.click("#onboarding__terms-checkbox");
+            await newPage.click('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > ul > li:nth-child(3) > button');
+            await newPage.click('#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.mm-box.onboarding-metametrics__buttons.mm-box--display-flex.mm-box--gap-4.mm-box--flex-direction-row.mm-box--width-full > button.mm-box.mm-text.mm-button-base.mm-button-base--size-lg.mm-button-primary.mm-text--body-md-medium.mm-box--padding-0.mm-box--padding-right-4.mm-box--padding-left-4.mm-box--display-inline-flex.mm-box--justify-content-center.mm-box--align-items-center.mm-box--color-primary-inverse.mm-box--background-color-primary-default.mm-box--rounded-pill');
+            await this.inputMnemonic(newPage, formattedMnemonic);
+            await newPage.waitForSelector("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button", { visible: true });
+            await newPage.click("#app-content > div > div.mm-box.main-container-wrapper > div > div > div > div.import-srp__actions > div > button");
+            const password = 'hunghung'
+            await this.inputPasswordMetaMask(newPage, password)
+            await new Promise(resolve => setTimeout(resolve, 3000));
             
-            
+            await newPage.waitForSelector("#app-content > div > div.mm-box.multichain-app-header.mm-box--margin-bottom-0.mm-box--display-flex.mm-box--align-items-center.mm-box--width-full.mm-box--background-color-background-alternative > div > div.mm-box.mm-text.mm-text--body-md.mm-text--ellipsis.mm-box--display-flex.mm-box--flex-direction-column.mm-box--align-items-center.mm-box--color-text-default > div > div > button", { visible: true });
+            await newPage.click("#app-content > div > div.mm-box.multichain-app-header.mm-box--margin-bottom-0.mm-box--display-flex.mm-box--align-items-center.mm-box--width-full.mm-box--background-color-background-alternative > div > div.mm-box.mm-text.mm-text--body-md.mm-text--ellipsis.mm-box--display-flex.mm-box--flex-direction-column.mm-box--align-items-center.mm-box--color-text-default > div > div > button");
+
+            const copiedValue = await newPage.evaluate(async () => {
+                return await navigator.clipboard.readText();
+            });
+
+            const temp =copiedValue
+            console.log('temp', temp);
+
+            fs.readFile('clipboardValue.txt', 'utf8', (err, data) => {
+                if (err) {
+                  console.error('Lỗi khi đọc file:', err);
+                  return;
+                }
+              
+                // Thêm copiedValue vào nội dung file sau khi đọc
+                const newContent = data + `\n${temp}`;
+              
+                // Ghi lại nội dung đã cập nhật vào file clipboardValue.txt
+                fs.writeFile('clipboardValue.txt', newContent, 'utf8', (err) => {
+                  if (err) {
+                    console.error('Lỗi khi ghi file:', err);
+                  } else {
+                    console.log('Đã ghi giá trị vào file clipboardValue.txt');
+                  }
+                });
+              });
         },
     };
 };

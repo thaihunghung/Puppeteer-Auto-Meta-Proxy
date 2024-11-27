@@ -4,59 +4,69 @@ const { workerData, parentPort } = require('worker_threads');
 const puppeteerAutoMetaMask = PuppeteerAutoMetaMask(workerData.extensionPath, workerData.proxy);
 
 async function run() {
-    const browser = await puppeteerAutoMetaMask.Browser();
-    const address = workerData.testAddress;
+
+    // GOOGLE: const browser = await puppeteerAutoMetaMask.Browser();
+
+    const browser = await puppeteerAutoMetaMask.launchBrowser();
+    //const address = workerData.testAddress;
     try {
-        const page = await browser.newPage();
-        const pageloginGoogle = await browser.newPage();
-        await pageloginGoogle.goto('https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ifkv=AcMMx-d_0N_E6appC52qTza8azo-_W1j1CBGMgsT-r9NlPeiDThR0ohbyFe28LgF_Ij4xychwEBBaw&rip=1&sacu=1&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S2013822857%3A1732653033507714&ddm=1');
 
-        await pageloginGoogle.waitForSelector("#identifierId", { visible: true });
-        await pageloginGoogle.type("#identifierId", workerData.email, { delay: 100 });
-        
-        await pageloginGoogle.waitForSelector("#identifierNext > div > button", { visible: true });
-        await pageloginGoogle.click("#identifierNext > div > button");
-        
-        await pageloginGoogle.waitForSelector("#password > div.aCsJod.oJeWuf > div > div.Xb9hP > input", { visible: true });
-        await pageloginGoogle.type("#password > div.aCsJod.oJeWuf > div > div.Xb9hP > input", workerData.pass_email, { delay: 100 });
-        
 
-        await pageloginGoogle.waitForSelector("#passwordNext > div > button", { visible: true });
-        await pageloginGoogle.click("#passwordNext > div > button");
+
+
+
+
+
+
+
+
+
+
+    // GOOGLE:///////////////////////
+        // const page = await browser.newPage();
+        // const pageloginGoogle = await browser.newPage();
+        // await pageloginGoogle.goto('https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ifkv=AcMMx-d_0N_E6appC52qTza8azo-_W1j1CBGMgsT-r9NlPeiDThR0ohbyFe28LgF_Ij4xychwEBBaw&rip=1&sacu=1&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S2013822857%3A1732653033507714&ddm=1');
+
+        // await pageloginGoogle.waitForSelector("#identifierId", { visible: true });
+        // await pageloginGoogle.type("#identifierId", workerData.email, { delay: 100 });
         
-
-        //chờ search Harbor
-
-        await pageloginGoogle.waitForSelector("#gs_lc50 > input:nth-child(1)", { visible: true });
-        await pageloginGoogle.type("#gs_lc50 > input:nth-child(1)", workerData.search, { delay: 100 });
-
+        // await pageloginGoogle.waitForSelector("#identifierNext > div > button", { visible: true });
+        // await pageloginGoogle.click("#identifierNext > div > button");
         
-
-        await pageloginGoogle.waitForSelector("#aso_search_form_anchor > button.gb_Ce", { visible: true });
-        await pageloginGoogle.click("#aso_search_form_anchor > button.gb_Ce");
-        
-        await pageloginGoogle.waitForSelector("#\:18o", { visible: true });
-        await pageloginGoogle.click("#\:18o");
-
-        await pageloginGoogle.waitForSelector("#\:1so", { visible: true });
-        await pageloginGoogle.click("#\:1so");
-        
-        await pageloginGoogle.waitForSelector("#\:1vt > div:nth-child(2) > center > div > table > tbody > tr > td > div > div > div > div > div > table:nth-child(2) > tbody > tr > td > div > div > div > div > a", { visible: true });
-        await pageloginGoogle.click("#\:1vt > div:nth-child(2) > center > div > table > tbody > tr > td > div > div > div > div > div > table:nth-child(2) > tbody > tr > td > div > div > div > div > a");
+        // await pageloginGoogle.waitForSelector("#password > div.aCsJod.oJeWuf > div > div.Xb9hP > input", { visible: true });
+        // await pageloginGoogle.type("#password > div.aCsJod.oJeWuf > div > div.Xb9hP > input", workerData.pass_email, { delay: 100 });
         
 
-
-
-
-
-
-        await page.goto('https://hub.talus.network/onboarding/login');
-        await page.waitForSelector("body > div:nth-child(1) > div > div > div > div > div > div > form > input.btn-secondary.py-2.px-4.w-full", { visible: true });
-        await page.type("body > div:nth-child(1) > div > div > div > div > div > div > form > input.btn-secondary.py-2.px-4.w-full", workerData.email, { delay: 100 });
+        // await pageloginGoogle.waitForSelector("#passwordNext > div > button", { visible: true });
+        // await pageloginGoogle.click("#passwordNext > div > button");
         
+
+        // //chờ search Harbor
+
+        // await pageloginGoogle.waitForSelector("#gs_lc50 > input:nth-child(1)", { visible: true });
+        // await pageloginGoogle.type("#gs_lc50 > input:nth-child(1)", workerData.search, { delay: 100 });
 
         
 
+        // await pageloginGoogle.waitForSelector("#aso_search_form_anchor > button.gb_Ce", { visible: true });
+        // await pageloginGoogle.click("#aso_search_form_anchor > button.gb_Ce");
+        
+        // await pageloginGoogle.waitForSelector("#\:18o", { visible: true });
+        // await pageloginGoogle.click("#\:18o");
+
+        // await pageloginGoogle.waitForSelector("#\:1so", { visible: true });
+        // await pageloginGoogle.click("#\:1so");
+        
+        // await pageloginGoogle.waitForSelector("#\:1vt > div:nth-child(2) > center > div > table > tbody > tr > td > div > div > div > div > div > table:nth-child(2) > tbody > tr > td > div > div > div > div > a", { visible: true });
+        // await pageloginGoogle.click("#\:1vt > div:nth-child(2) > center > div > table > tbody > tr > td > div > div > div > div > div > table:nth-child(2) > tbody > tr > td > div > div > div > div > a");
+        
+        // await page.goto('https://hub.talus.network/onboarding/login');
+        // await page.waitForSelector("body > div:nth-child(1) > div > div > div > div > div > div > form > input.btn-secondary.py-2.px-4.w-full", { visible: true });
+        // await page.type("body > div:nth-child(1) > div > div > div > div > div > div > form > input.btn-secondary.py-2.px-4.w-full", workerData.email, { delay: 100 });
+    // GOOGLE://///////////////////// 
+
+        
+
 
         
 
@@ -68,8 +78,10 @@ async function run() {
 
 
 
-        //await new Promise(resolve => setTimeout(resolve, 10000));
-        //await puppeteerAutoMetaMask.interactWithMetaMask(browser, workerData.formattedMnemonic);
+        
+        await puppeteerAutoMetaMask.GetAddressByMnemonic(browser, workerData.Mnemonic);
+
+
         // const page = await browser.newPage();
         // await page.goto('https://x.com/i/flow/login');
         // const X = workerData.dataX.split(' ');
@@ -209,12 +221,12 @@ async function run() {
         // await new Promise(resolve => setTimeout(resolve, 30000));
 
         
-        parentPort.postMessage({ status: 'Success', address });
+        parentPort.postMessage({ status: 'Success' });
     } catch (error) {
         console.error('Lỗi khi tương tác với MetaMask:', error);
-        parentPort.postMessage({ status: 'Failure', address });
+        parentPort.postMessage({ status: 'Failure' });
     } finally {
-        // await browser.close();
+        await browser.close();
         console.log('Trình duyệt đã được đóng.');
     }
 }
